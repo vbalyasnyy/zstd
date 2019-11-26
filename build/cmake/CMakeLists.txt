@@ -8,7 +8,7 @@
 # ################################################################
 
 cmake_minimum_required(VERSION 2.8.9 FATAL_ERROR)
-  
+
 # As of 2018-12-26 ZSTD has been validated to build with cmake version 3.13.2 new policies. 
 # Set and use the newest cmake policies that are validated to work 
 set(ZSTD_MAX_VALIDATED_CMAKE_MAJOR_VERSION "3") 
@@ -59,6 +59,24 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 include(GNUInstallDirs)
+
+#-----------------------------------------------------------------------------
+# Setup configs
+#-----------------------------------------------------------------------------
+#target_include_directories(
+#    ${PROJECT_NAME}
+#    PUBLIC
+#    "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>"
+#)
+
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
 
 #-----------------------------------------------------------------------------
 # Add extra compilation flags
@@ -159,42 +177,26 @@ add_custom_target(clean-all
 #-----------------------------------------------------------------------------
 # Add configure files
 #-----------------------------------------------------------------------------
-set(INCLUDE_INSTALL_DIRS "${CMAKE_INSTALL_INCLUDEDIR}")
-
 include(CMakePackageConfigHelpers)
-set(version_config "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake")
-set(project_config "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake")
 
-write_basic_package_version_file("${version_config}"
-    VERSION ${NNG_PACKAGE_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-configure_package_config_file(${PROJECT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in "${project_config}"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    PATH_VARS INCLUDE_INSTALL_DIRS)
-#[[
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR})
-
-install (TARGETS lib${PROJECT_NAME}_static
-    EXPORT ${PROJECT_NAME}-target
-    FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Tools
+write_basic_package_version_file(
+    "${version_config}" COMPATIBILITY SameMajorVersion
 )
 
-install(FILES "${project_config}" "${version_config}"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    COMPONENT Library)
-
-install(EXPORT ${PROJECT_NAME}-target
-    FILE ${PROJECT_NAME}-targets.cmake
-    NAMESPACE zstd::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-    COMPONENT Library
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
 )
 
-export(EXPORT ${PROJECT_NAME}-target
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake
-    NAMESPACE zstd::)
-]]
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}"
+)
+
+install(
+    EXPORT "${TARGETS_EXPORT_NAME}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}"
+)
+
