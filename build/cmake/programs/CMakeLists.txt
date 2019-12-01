@@ -97,6 +97,7 @@ option(ZSTD_LZ4_SUPPORT "LZ4 SUPPORT" OFF)
 
 # Add gzip support
 if (ZSTD_ZLIB_SUPPORT)
+    hunter_add_package(ZLIB)
     find_package(ZLIB REQUIRED)
 
     if (ZLIB_FOUND)
@@ -110,6 +111,7 @@ endif ()
 
 # Add lzma support
 if (ZSTD_LZMA_SUPPORT)
+    hunter_add_package(LibLZMA)
     find_package(LibLZMA REQUIRED)
 
     if (LIBLZMA_FOUND)
@@ -123,6 +125,7 @@ endif ()
 
 # Add lz4 support
 if (ZSTD_LZ4_SUPPORT)
+    hunter_add_package(LibLZ4)
     find_package(LibLZ4 REQUIRED)
 
     if (LIBLZ4_FOUND)

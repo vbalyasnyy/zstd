@@ -29,6 +29,11 @@ set(LIBRARY_DIR ${ZSTD_SOURCE_DIR}/lib)
 # Parse version
 include(GetZstdLibraryVersion)
 GetZstdLibraryVersion(${LIBRARY_DIR}/zstd.h zstd_VERSION_MAJOR zstd_VERSION_MINOR zstd_VERSION_PATCH)
+include("HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.20.64.tar.gz"
+    SHA1 "7b830dfda7a094b2af15f44b24ebd2489404d880"
+)
 
 if( CMAKE_MAJOR_VERSION LESS 3 )
   ## Provide cmake 3+ behavior for older versions of cmake
@@ -111,6 +116,7 @@ endif ()
 #-----------------------------------------------------------------------------
 if (ZSTD_MULTITHREAD_SUPPORT AND UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
+    hunter_add_package(pthread-stubs)
     find_package(Threads REQUIRED)
     if(CMAKE_USE_PTHREADS_INIT)
         set(THREADS_LIBS "${CMAKE_THREAD_LIBS_INIT}")
