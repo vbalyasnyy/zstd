@@ -30,4 +30,4 @@ else()
     message(SEND_ERROR "ZSTD currently does not support thread libraries other than pthreads")
 endif()
 
-install(TARGETS pzstd RUNTIME DESTINATION "bin")
+install(TARGETS pzstd EXPORT "${TARGETS_EXPORT_NAME}" RUNTIME DESTINATION "bin")
