@@ -22,6 +22,7 @@ set_property(TARGET pzstd APPEND PROPERTY COMPILE_DEFINITIONS "NDEBUG")
 set_property(TARGET pzstd APPEND PROPERTY COMPILE_OPTIONS "-Wno-shadow")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
+hunter_add_package(pthread-stubs)
 find_package(Threads REQUIRED)
 if (CMAKE_USE_PTHREADS_INIT)
     target_link_libraries(pzstd libzstd_shared ${CMAKE_THREAD_LIBS_INIT})
